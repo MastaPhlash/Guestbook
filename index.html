@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guestbook</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 2em; }
+        form { max-width: 400px; margin-bottom: 2em; }
+        label { display: block; margin-top: 1em; }
+        input, textarea { width: 100%; padding: 0.5em; margin-top: 0.2em; }
+        textarea { resize: vertical; }
+        .comment { border: 1px solid #ccc; padding: 1em; margin-bottom: 1em; }
+    </style>
+</head>
+<body>
+    <h1>Guestbook</h1>
+    <form id="guestbook-form">
+        <label for="name">Name</label>
+        <input type="text" id="name" name="name" maxlength="100" required>
+
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" maxlength="100" required>
+
+        <label for="message">Message</label>
+        <textarea id="message" name="message" rows="6" maxlength="1000" required></textarea>
+
+        <button type="submit">Sign Guestbook</button>
+    </form>
+    <div id="comments"></div>
+    <script>
+        async function loadComments() {
+            const res = await fetch('/comments');
+            const comments = await res.json();
+            const commentsDiv = document.getElementById('comments');
+            commentsDiv.innerHTML = '';
+            comments.reverse().forEach(c => {
+                const el = document.createElement('div');
+                el.className = 'comment';
+                el.innerHTML = `<strong>${c.name}</strong> (${c.email})<br>${c.message.replace(/\n/g, '<br>')}`;
+                commentsDiv.appendChild(el);
+            });
+        }
+        document.getElementById('guestbook-form').onsubmit = async (e) => {
+            e.preventDefault();
+            const form = e.target;
+            const data = {
+                name: form.name.value,
+                email: form.email.value,
+                message: form.message.value
+            };
+            await fetch('/comments', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            form.reset();
+            loadComments();
+        };
+        loadComments();
+    </script>
+</body>
+</html>
