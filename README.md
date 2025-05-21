@@ -1,5 +1,6 @@
 # Guestbook
-A basic JS Guestbook
+A basic Guestbook
+HTML frontend with JavaScript backend (Node.js/Express)
 
 ## Description
 This is a simple guestbook web application built with JavaScript and Node.js. Visitors can leave their name, email, and a message, which are saved to a JSON file on the server. All submitted comments are displayed for others to read.
