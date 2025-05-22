@@ -50,11 +50,23 @@ function validateAndSanitizeComment(input) {
   return { name, email, message };
 }
 
+// Simple in-memory rate limiting: 1 comment per IP per minute
+const rateLimitMap = new Map();
+const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 minute
+
 app.get('/comments', (req, res) => {
     res.json(loadComments());
 });
 
 app.post('/comments', (req, res) => {
+    const ip = req.ip;
+    const now = Date.now();
+    const lastTime = rateLimitMap.get(ip) || 0;
+    if (now - lastTime < RATE_LIMIT_WINDOW_MS) {
+        return res.status(429).send('You can only post one comment per minute.');
+    }
+    rateLimitMap.set(ip, now);
+
     const { name, email, message } = req.body;
     if (!name || !email || !message) return res.status(400).send('All fields required');
     try {
