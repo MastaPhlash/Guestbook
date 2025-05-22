@@ -72,7 +72,7 @@ app.post('/comments', (req, res) => {
     try {
       const { name: validName, email: validEmail, message: validMessage } = validateAndSanitizeComment({ name, email, message });
       const comments = loadComments();
-      comments.push({ name: validName, email: validEmail, message: validMessage });
+      comments.push({ name: validName, email: validEmail, message: validMessage, timestamp: new Date().toISOString() });
       saveComments(comments);
       res.status(201).json({ ok: true });
     } catch (error) {
